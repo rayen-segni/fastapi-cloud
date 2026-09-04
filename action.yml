@@ -1,0 +1,16 @@
+name: FastAPI Cloud Deploy
+
+author: Rayen Segni
+
+description: Deploy a FastAPI application to FastAPI Cloud from GitHub Actions.
+
+runs:
+  using: composite
+  steps:
+    - name: FastAPI Cloud Deploy
+      shell: bash
+      run: echo "FastAPI Cloud Deploy is not implemented yet."
+
+branding:
+  icon: cloud
+  color: blue
