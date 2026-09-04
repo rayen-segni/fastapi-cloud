@@ -19,4 +19,4 @@ jobs:
           app-id: ${{ secrets.FASTAPI_CLOUD_APP_ID }}
           token: ${{ secrets.FASTAPI_CLOUD_TOKEN }}
           working-directory: "./tests/dummy-app/src/app"
-          not-wait: "true"
+          # not-wait: "true"

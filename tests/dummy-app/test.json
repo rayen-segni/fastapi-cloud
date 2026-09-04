@@ -1,0 +1,11 @@
+{
+    "data": 
+        {"deployment_id": "221ab5ab-25ab-4805-a391-06d06319cc4a",
+            "app_id": "6660da32-a65b-4056-8adb-1540d77b386e",
+            "slug": "test-app-c2d5c6ea",
+            "status": "ready_for_build",
+            "dashboard_url": "https://dashboard.fastapicloud.com/snrayen8-94d3270c/apps/test-app-c2d5c6ea/deployments/221ab5ab-25ab-4805-a391-06d06319cc4a",
+            "url": "https://test-app-c2d5c6ea.fastapicloud.dev"
+        },
+    "hint": "Check deployment status in the FastAPI Cloud dashboard: https://dashboard.fastapicloud.com/snrayen8-94d3270c/apps/test-app-c2d5c6ea/deployments/221ab5ab-25ab-4805-a391-06d06319cc4a"
+}
