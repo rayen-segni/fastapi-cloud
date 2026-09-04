@@ -28,12 +28,13 @@ runs:
   steps:
   - name: Deploy to FastAPI Cloud
     shell: bash
-    working-directory: ${{ inputs.working-directory }}
     env:
       FASTAPI_CLOUD_APP_ID: ${{ inputs.app-id }}
       FASTAPI_CLOUD_TOKEN: ${{ inputs.token }}
       INPUT_NO_WAIT: ${{ inputs.no-wait }}
+      APP_DIR: ${{ inputs.working-directory }}
     run: |
+      cd $APP_DIR
       # Mask secret in runner logs
       echo "::add-mask::$FASTAPI_CLOUD_TOKEN"
 
