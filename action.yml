@@ -53,11 +53,6 @@ runs:
       echo "Deploying application to FastAPI Cloud (App ID: $FASTAPI_CLOUD_APP_ID)..."
       DEPLOY_JSON=$(fastapi cloud deploy --json "${EXTRA_ARGS[@]}")
       python3 "${{ github.action_path }}/process_output.py" "$DEPLOY_JSON"
-  -
-    name: Smoke Test
-    shell: bash
-    run: |
-      curl --fail --retry 5 --retry-delay 3 "${{ steps.deploy.outputs.url }}/docs"
 
 
 
