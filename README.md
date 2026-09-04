@@ -57,7 +57,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Deploy to FastAPI Cloud
-        uses: rayensegni/fastapi-cloud-deploy@v1
+        uses: rayen-segni/fastapi-cloud@v1
         with:
           app-id: ${{ secrets.FASTAPI_CLOUD_APP_ID }}
           token: ${{ secrets.FASTAPI_CLOUD_TOKEN }}
