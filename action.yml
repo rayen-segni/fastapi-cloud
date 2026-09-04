@@ -18,7 +18,7 @@ inputs:
     required: false
     default: "./"
 
-  not-wait:
+  no-wait:
     description: Triggers the deployment and immediately exits without waiting for the build and deployment status to finish.
     required: false
     default: "false"
@@ -26,7 +26,9 @@ inputs:
 runs:
   using: composite
   steps:
-  - name: Deploy to FastAPI Cloud
+  - 
+    name: Deploy to FastAPI Cloud
+    id: deploy
     shell: bash
     env:
       FASTAPI_CLOUD_APP_ID: ${{ inputs.app-id }}
@@ -35,33 +37,27 @@ runs:
       APP_DIR: ${{ inputs.working-directory }}
     run: |
       cd $APP_DIR
-      # Mask secret in runner logs
-      echo "::add-mask::$FASTAPI_CLOUD_TOKEN"
+      # 1. Run Validations & CLI installation
 
-      # Validate required inputs upfront
-      if [ -z "$FASTAPI_CLOUD_TOKEN" ]; then
-        echo "::error::Missing required input: token (or secret FASTAPI_CLOUD_TOKEN)"
-        exit 1
-      fi
+      bash "${{ github.action_path }}/validation.sh"
 
-      if [ -z "$FASTAPI_CLOUD_APP_ID" ]; then
-        echo "::error::Missing required input: app-id"
-        exit 1
-      fi
-
-      # Ensure fastapi CLI is available
-      if ! command -v fastapi &> /dev/null; then
-        echo "Installing FastAPI CLI..."
-        pipx install "fastapi[standard]"
-      fi
+      # 2. Check flags
 
       EXTRA_ARGS=()
       if [ "$INPUT_NO_WAIT" = "true" ]; then
         EXTRA_ARGS+=(--no-wait)
       fi
 
+      # 3. Deploy with --json and process output
+
       echo "Deploying application to FastAPI Cloud (App ID: $FASTAPI_CLOUD_APP_ID)..."
-      fastapi cloud deploy "${EXTRA_ARGS[@]}"
+      DEPLOY_JSON=$(fastapi cloud deploy --json "${EXTRA_ARGS[@]}")
+      python3 "${{ github.action_path }}/process_output.py" "$DEPLOY_JSON"
+  -
+    name: Smoke Test
+    shell: bash
+    run: |
+      curl --fail --retry 5 --retry-delay 3 "${{ steps.deploy.outputs.url }}/docs"
 
 
 
