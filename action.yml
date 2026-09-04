@@ -6,15 +6,15 @@ description: Deploy a FastAPI application to FastAPI Cloud from GitHub Actions.
 
 inputs:
   app-id:
-    description: "App ID from FastAPI CLoud Project"
+    description: App ID from FastAPI CLoud Project
     required: true
 
   token:
     description: Used for authentication. You can find it in your fastapi account settings
     required: true
 
-  working-directory:
-    description: "Path to the app dir"
+  work-dir:
+    description: Path to the App Directory
     required: false
     default: "./"
 
@@ -45,9 +45,9 @@ runs:
     - name: Deploy the App
       shell: bash
       env:
-        FASTAPI_CLOUD_APP_ID: ${{ inputs.fastapi-cloud-app-id }}
-        FASTAPI_CLOUD_TOKEN: ${{ inputs.fastapi-cloud-token }}
-        APP_DIR: ${{ inputs.working-directory }}
+        FASTAPI_CLOUD_APP_ID: ${{ inputs.app-id }}
+        FASTAPI_CLOUD_TOKEN: ${{ inputs.token }}
+        APP_DIR: ${{ inputs.work-dir }}
         NOT_WAIT: ${{ inputs.not-wait }}
       run: |
         cd "$APP_DIR"
