@@ -13,7 +13,7 @@ inputs:
     description: Used for authentication. You can find it in your fastapi account settings
     required: true
 
-  work-dir:
+  working-directory:
     description: Path to the App Directory
     required: false
     default: "./"
@@ -26,43 +26,44 @@ inputs:
 runs:
   using: composite
   steps:
-  # Install Python
-    -
-      name: Install Python Version 3.13
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.13"
+  - name: Deploy to FastAPI Cloud
+    shell: bash
+    working-directory: ${{ inputs.working-directory }}
+    env:
+      FASTAPI_CLOUD_APP_ID: ${{ inputs.app-id }}
+      FASTAPI_CLOUD_TOKEN: ${{ inputs.token }}
+      INPUT_NO_WAIT: ${{ inputs.no-wait }}
+    run: |
+      # Mask secret in runner logs
+      echo "::add-mask::$FASTAPI_CLOUD_TOKEN"
 
-  # Install FastAPI
-    -
-      name: Upgrade Pip & Install FastAPI
-      shell: bash
-      run: |
-        python3 -m pip install --upgrade pip
-        python3 -m pip install "fastapi[standard]"
-    
-    # Set up Environment Variables And Deploy The App
-    - name: Deploy the App
-      shell: bash
-      env:
-        FASTAPI_CLOUD_APP_ID: ${{ inputs.app-id }}
-        FASTAPI_CLOUD_TOKEN: ${{ inputs.token }}
-        APP_DIR: ${{ inputs.work-dir }}
-        NOT_WAIT: ${{ inputs.not-wait }}
-      run: |
-        cd "$APP_DIR"
+      # Validate required inputs upfront
+      if [ -z "$FASTAPI_CLOUD_TOKEN" ]; then
+        echo "::error::Missing required input: token (or secret FASTAPI_CLOUD_TOKEN)"
+        exit 1
+      fi
 
-        echo "Application with ID $FASTAPI_CLOUD_APP_ID ready to deploy..."
+      if [ -z "$FASTAPI_CLOUD_APP_ID" ]; then
+        echo "::error::Missing required input: app-id"
+        exit 1
+      fi
 
-        EXTRA_ARGS=()
-        if [ "$NOT_WAIT" = "true" ]; then
-          EXTRA_ARGS+=(--no-wait)
-        fi
+      # Ensure fastapi CLI is available
+      if ! command -v fastapi &> /dev/null; then
+        echo "Installing FastAPI CLI..."
+        pipx install "fastapi[standard]"
+      fi
 
-        python3 -m fastapi deploy "${EXTRA_ARGS[@]}"
+      EXTRA_ARGS=()
+      if [ "$INPUT_NO_WAIT" = "true" ]; then
+        EXTRA_ARGS+=(--no-wait)
+      fi
+
+      echo "Deploying application to FastAPI Cloud (App ID: $FASTAPI_CLOUD_APP_ID)..."
+      fastapi cloud deploy "${EXTRA_ARGS[@]}"
 
 
 
 branding:
-  icon: cloud
-  color: blue
+  icon: upload-cloud
+  color: green
