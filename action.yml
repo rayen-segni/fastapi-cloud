@@ -15,7 +15,7 @@ inputs:
 
   working-directory:
     description: "Path to the app dir"
-    required: true
+    required: false
     default: "./"
 
   not-wait:
