@@ -4,12 +4,64 @@ author: Rayen Segni
 
 description: Deploy a FastAPI application to FastAPI Cloud from GitHub Actions.
 
+inputs:
+  app-id:
+    description: "App ID from FastAPI CLoud Project"
+    required: true
+
+  token:
+    description: Used for authentication. You can find it in your fastapi account settings
+    required: true
+
+  working-directory:
+    description: "Path to the app dir"
+    required: true
+    default: "./"
+
+  not-wait:
+    description: Triggers the deployment and immediately exits without waiting for the build and deployment status to finish.
+    required: false
+    default: "false"
+
 runs:
   using: composite
   steps:
-    - name: FastAPI Cloud Deploy
+  # Install Python
+    -
+      name: Install Python Version 3.13
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.13"
+
+  # Install FastAPI
+    -
+      name: Upgrade Pip & Install FastAPI
       shell: bash
-      run: echo "FastAPI Cloud Deploy is not implemented yet."
+      run: |
+        python3 -m pip install --upgrade pip
+        python3 -m pip install "fastapi[standard]"
+    
+    # Set up Environment Variables And Deploy The App
+    - name: Deploy the App
+      shell: bash
+      env:
+        FASTAPI_CLOUD_APP_ID: ${{ inputs.fastapi-cloud-app-id }}
+        FASTAPI_CLOUD_TOKEN: ${{ inputs.fastapi-cloud-token }}
+        APP_DIR: ${{ inputs.working-directory }}
+        NOT_WAIT: ${{ inputs.not-wait }}
+      run: |
+        cd "$APP_DIR"
+
+        echo "Application with ID $FASTAPI_CLOUD_APP_ID ready to deploy..."
+
+        EXTRA_ARGS=()
+        if [ "$NOT_WAIT" = "true" ]; then
+          EXTRA_ARGS+=(--no-wait)
+        fi
+
+        python3 -m fastapi deploy "${EXTRA_ARGS[@]}"
+
+
 
 branding:
   icon: cloud
